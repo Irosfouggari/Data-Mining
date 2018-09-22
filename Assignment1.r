@@ -7,16 +7,18 @@ impurity <- function(vector) {
   return(p*(1-p))
 }
 
-bestsplit <- function(x, y) {
+bestsplit <- function(x, y, minleaf) {
   df <- data.frame(x, y)
   
   sorted_x <- sort(unique(x))
   quality <- c()
+  bquality <- 99999
+  bcondition <- NULL
   
   n <- length(x)
   
   i <- 1
-  while ( i < length(sorted_x) ) {
+  for ( i in 1:(length(sorted_x) - 1) ) {
     c <- (sorted_x[i] + sorted_x[i+1]) / 2
     
     subvector_y1 <- df[which(df[,1] <= c), 2]
@@ -25,17 +27,25 @@ bestsplit <- function(x, y) {
     n1 <- length(subvector_y1)
     n2 <- length(subvector_y2)
     
-    q <- (n1/n)*impurity(subvector_y1) + (n2/n)*impurity(subvector_y2)
-    quality <- c(quality, q)
-    
-    i <- i+1
+    if ( (n1 <= minleaf) || (n2 <= minleaf) ) {
+      # we does not allow these splits
+      
+    } else {
+      q <- (n1/n)*impurity(subvector_y1) + (n2/n)*impurity(subvector_y2)
+      if ( q < bquality ) {
+        bquality <- q
+        bcondition <- c
+      }
+    }
   }
   
-  best_impurity <- min(quality)
-  j <- which(quality == best_impurity)
+  if ( is.null(bcondition) ) {
+    return(NULL)
+  }
+  
   bs <- list()
-  bs[[1]] <- best_impurity
-  bs[[2]] <- (sorted_x[j] + sorted_x[j + 1]) / 2
+  bs[[1]] <- bquality
+  bs[[2]] <- bcondition
   return(bs)
 }
 
@@ -50,14 +60,14 @@ is.leaf <- function(data, nmin) {
   
   n_0 <- length(which(data[, "y"] == 0))
   n_1 <- length(which(data[, "y"] == 1))
-  if ( n_0 == 0 || n_1 == 0 ) {
+  if ( n_0 == 0 || n_1 == 0 ) { # pure node
     return(TRUE)
   }
   
   return(FALSE)
 }
 
-split.node <- function(data, nmin) {
+split.node <- function(data, nmin, minleaf) {
   if ( is.leaf(data, nmin) ) {
     return(NULL)
   }
@@ -67,11 +77,15 @@ split.node <- function(data, nmin) {
   
   bs <- 9999999
   
+  column_label <- NULL
+  column_condition <- NULL
+  
   for ( c in 1:(ncol(data)-1) ) {
     column <- data[, c]
-    tmp_bs <- bestsplit(column, classification_column)
-    if ( is.null(tmp_bs[[1]]) ) {
-      # skip
+    tmp_bs <- bestsplit(column, classification_column, minleaf)
+    if ( is.null(tmp_bs) ) {
+      # skip, there does not exist a best split
+      
     } else {
       if ( tmp_bs[[1]] < bs ) {
         bs <- tmp_bs[[1]]
@@ -81,14 +95,26 @@ split.node <- function(data, nmin) {
     }
   }
   
+  if ( is.null(column_label) && is.null(column_condition) ) {
+    return(NULL)
+  }
+  
   col_con <- list()
   col_con[[1]] <- column_label
   col_con[[2]] <- column_condition
   return(col_con)
 }
 
-tree.grow.help <- function(data, nmin) {
-  bsplit <- split.node(data, nmin) 
+tree.grow.help <- function(data, nmin, minleaf, nfeat) {
+  nc <- ncol(data)
+  if ( nc <= nfeat + 1 ) { # +1 due to y column
+    tmp_data <- data
+  } else {
+    rnd_columns <- sample(nc - 1, size=nfeat, replace=FALSE)
+    tmp_data <- data[, c(rnd_columns, nc)] # we add nc (y column)
+  }
+  
+  bsplit <- split.node(tmp_data, nmin, minleaf) 
   bsplit_label <- bsplit[[1]]
   bsplit_condition <- bsplit[[2]]
   
@@ -103,11 +129,11 @@ tree.grow.help <- function(data, nmin) {
   
   left_data <- data[which(data[,bsplit_label] <= bsplit_condition), , drop = FALSE]
   left_data <- left_data[, -which(names(left_data) == bsplit_label), drop = FALSE]
-  left_tree <- tree.grow.help(left_data, nmin)
+  left_tree <- tree.grow.help(left_data, nmin, minleaf, nfeat)
   
   right_data <- data[which(data[,bsplit_label] > bsplit_condition), , drop = FALSE]
   right_data <- right_data[, -which(names(right_data) == bsplit_label), drop = FALSE]
-  right_tree <- tree.grow.help(right_data, nmin)
+  right_tree <- tree.grow.help(right_data, nmin, minleaf, nfeat)
   
   tree <- list()
   tree[[1]] <- bsplit 
@@ -117,9 +143,9 @@ tree.grow.help <- function(data, nmin) {
   return(tree)
 }
 
-tree.grow <- function(x, y, nmin) {
+tree.grow <- function(x, y, nmin, minleaf, nfeat) {
   data <- cbind(x, "y" = y)
-  return(tree.grow.help(data, nmin))
+  return(tree.grow.help(data, nmin, minleaf, nfeat))
 }
 
 tree.classify.help <- function(sample, tr) {
@@ -155,5 +181,5 @@ tree.classify <- function(x, tr) {
 }
 
 d <- credit.dat
-t <- tree.grow(d[, -6], d[, 6], 0)
+t <- tree.grow(d[, -6], d[, 6], 0, 0, 3)
 r <- tree.classify(d[, -6], t)
