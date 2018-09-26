@@ -110,7 +110,7 @@ tree.grow.help <- function(data, nmin, minleaf, nfeat) {
   if ( nc <= nfeat + 1 ) { # +1 due to y column
     tmp_data <- data
   } else {
-    rnd_columns <- sample(nc - 1, size=nfeat, replace=FALSE)
+    rnd_columns <- sample(nc - 1, size = nfeat, replace = FALSE)
     tmp_data <- data[, c(rnd_columns, nc)] # we add nc (y column)
   }
   
@@ -128,11 +128,11 @@ tree.grow.help <- function(data, nmin, minleaf, nfeat) {
   }
   
   left_data <- data[which(data[,bsplit_label] <= bsplit_condition), , drop = FALSE]
-  left_data <- left_data[, -which(names(left_data) == bsplit_label), drop = FALSE]
+  # left_data <- left_data[, -which(names(left_data) == bsplit_label), drop = FALSE]
   left_tree <- tree.grow.help(left_data, nmin, minleaf, nfeat)
   
   right_data <- data[which(data[,bsplit_label] > bsplit_condition), , drop = FALSE]
-  right_data <- right_data[, -which(names(right_data) == bsplit_label), drop = FALSE]
+  # right_data <- right_data[, -which(names(right_data) == bsplit_label), drop = FALSE]
   right_tree <- tree.grow.help(right_data, nmin, minleaf, nfeat)
   
   tree <- list()
@@ -170,16 +170,61 @@ tree.classify.help <- function(sample, tr) {
     }
   }
   
-  tree.classify.help(sample[, -which(names(sample) == col_label)], tree)
+  tree.classify.help(sample, tree)
 }
 
 tree.classify <- function(x, tr) {
-  for ( row in 1:nrow(x) ) {
-    print(tree.classify.help(x[row, , drop = FALSE], tr))
+  predictions <- c()
+  if ( tr == "1" ) {
+    print("Just root node.")
   }
-  return("end")
+  
+  else {
+    for ( row in 1:nrow(x) ) {
+      p <- tree.classify.help(x[row, , drop = FALSE], tr)
+      predictions <- c(predictions, p)
+    }
+  }
+  return(predictions)
 }
 
-d <- credit.dat
-t <- tree.grow(d[, -6], d[, 6], 0, 0, 3)
-r <- tree.classify(d[, -6], t)
+tree.grow.bag <- function(x, y, nmin, minleaf, nfeat, m) {
+  trees <- list()
+  for ( i in 1:m ) {
+    random_rows <- sample(nrow(x), nrow(x), replace = TRUE)
+    tmp_x <- x[random_rows,]
+    tmp_y <- y[random_rows]
+    trees[[i]] <- tree.grow(tmp_x, tmp_y, nmin, minleaf, nfeat)
+  }
+  return(trees)
+}
+
+tree.classify.bag <- function(trees, x) {
+  predictions <- c()
+  
+  for (r in 1:nrow(x)) {
+    row <- x[r, , drop = FALSE]
+    tmp_predictions <- c()
+    for (t in 1:length(trees)) {
+      current_tree <- trees[[t]]
+      p <- tree.classify(row, current_tree)
+      tmp_predictions <- c(tmp_predictions, p)
+    }
+    
+    n <- length(which(tmp_predictions == 0))
+    if ( n > m/2 ) {
+      predictions <- c(predictions, 0)
+    } else {
+      predictions <- c(predictions, 1)
+    }
+  }
+  
+  
+  print(predictions)
+}
+
+#d <- credit.dat
+#t <- tree.grow(d[, -6], d[, 6], 0, 0, 4444)
+#r <- tree.classify(d[, -6], t)
+b <- tree.grow.bag(d[, -6], d[, 6], 0, 0, 4444, 10)
+pp <- tree.classify.bag(b, d[, -6])
