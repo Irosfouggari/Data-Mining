@@ -175,7 +175,7 @@ tree.classify.help <- function(sample, tr) {
 
 tree.classify <- function(x, tr) {
   predictions <- c()
-  if ( tr == "1" ) {
+  if ( class(tr) != "list" ) {
     print("Just root node.")
   }
   
@@ -201,6 +201,7 @@ tree.grow.bag <- function(x, y, nmin, minleaf, nfeat, m) {
 
 tree.classify.bag <- function(trees, x) {
   predictions <- c()
+  num_trees <- length(trees)
   
   for (r in 1:nrow(x)) {
     row <- x[r, , drop = FALSE]
@@ -212,19 +213,18 @@ tree.classify.bag <- function(trees, x) {
     }
     
     n <- length(which(tmp_predictions == 0))
-    if ( n > m/2 ) {
+    if ( n > num_trees/2 ) {
       predictions <- c(predictions, 0)
     } else {
       predictions <- c(predictions, 1)
     }
   }
-  
-  
-  print(predictions)
+
+  return(predictions)
 }
 
-#d <- credit.dat
-#t <- tree.grow(d[, -6], d[, 6], 0, 0, 4444)
-#r <- tree.classify(d[, -6], t)
+d <- credit.dat
+t <- tree.grow(d[, -6], d[, 6], 0, 0, 4444)
+r <- tree.classify(d[, -6], t)
 b <- tree.grow.bag(d[, -6], d[, 6], 0, 0, 4444, 10)
 pp <- tree.classify.bag(b, d[, -6])
