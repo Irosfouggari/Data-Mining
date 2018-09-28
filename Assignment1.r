@@ -128,11 +128,9 @@ tree.grow.help <- function(data, nmin, minleaf, nfeat) {
   }
   
   left_data <- data[which(data[,bsplit_label] <= bsplit_condition), , drop = FALSE]
-  # left_data <- left_data[, -which(names(left_data) == bsplit_label), drop = FALSE]
   left_tree <- tree.grow.help(left_data, nmin, minleaf, nfeat)
   
   right_data <- data[which(data[,bsplit_label] > bsplit_condition), , drop = FALSE]
-  # right_data <- right_data[, -which(names(right_data) == bsplit_label), drop = FALSE]
   right_tree <- tree.grow.help(right_data, nmin, minleaf, nfeat)
   
   tree <- list()
