@@ -1,4 +1,3 @@
-credit.dat <- read.csv("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/credit.txt")
 
 impurity <- function(vector) {
   n <- length(vector)
@@ -12,7 +11,7 @@ bestsplit <- function(x, y, minleaf) {
   
   sorted_x <- sort(unique(x))
   quality <- c()
-  bquality <- 99999
+  bquality <- NULL
   bcondition <- NULL
   
   n <- length(x)
@@ -27,15 +26,14 @@ bestsplit <- function(x, y, minleaf) {
     n1 <- length(subvector_y1)
     n2 <- length(subvector_y2)
     
-    if ( (n1 <= minleaf) || (n2 <= minleaf) ) {
-      # we does not allow these splits
-      
-    } else {
-      q <- (n1/n)*impurity(subvector_y1) + (n2/n)*impurity(subvector_y2)
-      if ( q < bquality ) {
-        bquality <- q
-        bcondition <- c
-      }
+    if ( (n1 <= minleaf) || (n2 <= minleaf) ) { # we do not allow these splits
+      break
+    } 
+    
+    q <- (n1/n)*impurity(subvector_y1) + (n2/n)*impurity(subvector_y2)
+    if ( is.null(bquality) || (q < bquality) ) {
+      bquality <- q
+      bcondition <- c
     }
   }
   
@@ -50,11 +48,7 @@ bestsplit <- function(x, y, minleaf) {
 }
 
 is.leaf <- function(data, nmin) {
-  if ( ncol(data) <= 1 ) { # can not split it anymore
-    return(TRUE)
-  }
-  
-  if ( nrow(data) <= nmin ) {
+  if ( (ncol(data) <= 1) || (nrow(data) <= nmin) ) { # can not split it anymore
     return(TRUE)
   }
   
@@ -75,7 +69,7 @@ split.node <- function(data, nmin, minleaf) {
   column_names <- names(data)
   classification_column <- data[, "y"]
   
-  bs <- 9999999
+  bs <- NULL
   
   column_label <- NULL
   column_condition <- NULL
@@ -83,16 +77,17 @@ split.node <- function(data, nmin, minleaf) {
   for ( c in 1:(ncol(data)-1) ) {
     column <- data[, c]
     tmp_bs <- bestsplit(column, classification_column, minleaf)
-    if ( is.null(tmp_bs) ) {
-      # skip, there does not exist a best split
-      
-    } else {
-      if ( tmp_bs[[1]] < bs ) {
-        bs <- tmp_bs[[1]]
-        column_label <- column_names[c]
-        column_condition <- tmp_bs[[2]]
-      }
+    
+    if ( is.null(tmp_bs) ) { # skip, there does not exist a best split
+      break
+    } 
+    
+    if ( is.null(bs) || (tmp_bs[[1]] < bs) ) {
+      bs <- tmp_bs[[1]]
+      column_label <- column_names[c]
+      column_condition <- tmp_bs[[2]]
     }
+    
   }
   
   if ( is.null(column_label) && is.null(column_condition) ) {
@@ -115,17 +110,18 @@ tree.grow.help <- function(data, nmin, minleaf, nfeat) {
   }
   
   bsplit <- split.node(tmp_data, nmin, minleaf) 
-  bsplit_label <- bsplit[[1]]
-  bsplit_condition <- bsplit[[2]]
   
-  if ( is.null(bsplit_condition) ) { # split does not exist -> node becomes a leaf
+  if ( is.null(bsplit) ) { # split does not exist -> node becomes a leaf
     n_0 <- length(which(data[, "y"] == 0))
     n_1 <- length(which(data[, "y"] == 1))
     if ( n_0 > n_1 ) {
-      return("0")
+      return(0)
     }
-    return("1")
+    return(1)
   }
+  
+  bsplit_label <- bsplit[[1]]
+  bsplit_condition <- bsplit[[2]]
   
   left_data <- data[which(data[,bsplit_label] <= bsplit_condition), , drop = FALSE]
   left_tree <- tree.grow.help(left_data, nmin, minleaf, nfeat)
@@ -158,17 +154,11 @@ tree.classify.help <- function(sample, tr) {
     tree <- tr[[3]]
   }
   
-  if ( length(tree) == 1 ) {
-    if ( tree == "0" ) {
-      return(0)
-    }
-    
-    if ( tree == "1" ) {
-      return(1)
-    }
+  if ( class(tree) == "numeric" ) {
+    return(tree)
   }
   
-  tree.classify.help(sample, tree)
+  return(tree.classify.help(sample, tree))
 }
 
 tree.classify <- function(x, tr) {
@@ -206,6 +196,7 @@ tree.classify.bag <- function(trees, x) {
     tmp_predictions <- c()
     for (t in 1:length(trees)) {
       current_tree <- trees[[t]]
+      print(length(current_tree))
       p <- tree.classify(row, current_tree)
       tmp_predictions <- c(tmp_predictions, p)
     }
@@ -217,12 +208,7 @@ tree.classify.bag <- function(trees, x) {
       predictions <- c(predictions, 1)
     }
   }
-
+  
   return(predictions)
 }
 
-d <- credit.dat
-t <- tree.grow(d[, -6], d[, 6], 0, 0, 4444)
-r <- tree.classify(d[, -6], t)
-b <- tree.grow.bag(d[, -6], d[, 6], 0, 0, 4444, 10)
-pp <- tree.classify.bag(b, d[, -6])
