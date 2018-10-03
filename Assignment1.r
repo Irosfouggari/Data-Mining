@@ -71,7 +71,7 @@ bestsplit <- function(x, y, minleaf) {
 #count the length of those data belong to class=0 or class=0 and check for pure node
 #return(TRUE)/(FALSE)
 is.leaf <- function(data, nmin) {
-  if ( (ncol(data) <= 1) || (nrow(data) <= nmin) ) { # can not split it anymore
+  if ( (ncol(data) <= 1) || (nrow(data) < nmin) ) { # can not split it anymore
     return(TRUE)
   }
   n_0 <- length(which(data[, "y"] == 0)) #count the length of those data belong to class=0
@@ -194,7 +194,7 @@ tree.classify.help <- function(sample, tr) {
   con <- c[[2]]
   value <- sample[1, col_label]
   
-  if ( value <= con ) { # left tree
+  if ( value < con ) { # left tree
     tree <- tr[[2]]
   } else { # right tree
     tree <- tr[[3]]
@@ -248,7 +248,6 @@ tree.classify.bag <- function(trees, x) {
     tmp_predictions <- c()
     for (t in 1:length(trees)) {
       current_tree <- trees[[t]]
-      print(length(current_tree))
       p <- tree.classify(row, current_tree)
       tmp_predictions <- c(tmp_predictions, p)
     }

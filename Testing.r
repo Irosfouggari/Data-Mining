@@ -48,6 +48,7 @@ accurancy <- function(y_p, y_r) { # (TP + TN)/(TP + TP + FP + FN)
       FP <- FP + 1
     }
   }
+  print(TP,FN,TN,FP)
   return((TP + TN)/(TP + TP + FP + FN))
 }
 
@@ -84,6 +85,7 @@ eclipse.single.prediciton.train <- tree.classify(eclipse.2.x, eclipse.single.tre
 eclipse.single.precision.train <- precision(eclipse.single.prediciton.train, eclipse.2.y)
 eclipse.single.recall.train <- recall(eclipse.single.prediciton.train, eclipse.2.y)
 eclipse.single.accurancy.train <- accurancy(eclipse.single.prediciton.train, eclipse.2.y)
+
 
 eclipse.single.prediciton.test <- tree.classify(eclipse.3.x, eclipse.single.tree)
 eclipse.single.precision.test <- precision(eclipse.single.prediciton.test, eclipse.3.y)
