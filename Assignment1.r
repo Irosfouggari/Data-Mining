@@ -1,10 +1,19 @@
 
+#impurity(vector) given a vector returns the impurity (return(p*(1-p)))
 impurity <- function(vector) {
   n <- length(vector)
   n_0 <- length(which(vector == 0))
   p <- n_0/n
   return(p*(1-p))
 }
+
+
+#bestsplit(column, classification_column, minleaf) counts the bestsplit 
+#returns a list where as the first element contains the bestquality and as the second element the best condition
+#bs <- list()
+#bs[[1]] <- bquality
+#bs[[2]] <- bcondition
+#return(bs)
 
 bestsplit <- function(x, y, minleaf) {
   #we create a data frame of x and y
@@ -55,14 +64,16 @@ bestsplit <- function(x, y, minleaf) {
   return(bs)
 }
 
-#if the number of columns can not split it anymore
-#fewer cases than nmin, becomes a leaf
 
+#is.leaf(data, nmin) accepts as input the data(x+y) and controls the leaf cases or a pure node.
+#if the number od data columns fewer than 1 cannotsplit anymore
+#if the number of data rows feweer than nmin=> becomes a leaf
+#count the length of those data belong to class=0 or class=0 and check for pure node
+#return(TRUE)/(FALSE)
 is.leaf <- function(data, nmin) {
   if ( (ncol(data) <= 1) || (nrow(data) <= nmin) ) { # can not split it anymore
     return(TRUE)
   }
-  
   n_0 <- length(which(data[, "y"] == 0)) #count the length of those data belong to class=0
   n_1 <- length(which(data[, "y"] == 1)) #count lenght class=1
   if ( n_0 == 0 || n_1 == 0 ) { # pure node data belong to a single class
@@ -72,6 +83,14 @@ is.leaf <- function(data, nmin) {
   return(FALSE)
 }
 
+
+
+#split.node(tmp_data, nmin, minleaf) accepts as input temp.data from tree.grow help 
+#and for those nodes are not leaves calls bestsplit()
+#returns a list where as the first element contains the bestquality and as the second element the best condition
+#col_con[[1]] <- column_label
+#col_con[[2]] <- column_condition
+#return(col_con)
 split.node <- function(data, nmin, minleaf) {
   # we check if it a leaf
   if ( is.leaf(data, nmin) ) { #if is.leaf return true
@@ -114,6 +133,11 @@ split.node <- function(data, nmin, minleaf) {
   return(col_con)
 }
 
+
+#tree.grow.help(data, nmin, minleaf, nfeat) checks if the number of columns of our data = nfeat
+#then calls split.node that calls best.split
+#accepts the best split label and the best split condition
+#and then creates the tree with recursion
 tree.grow.help <- function(data, nmin, minleaf, nfeat) {
   
   nc <- ncol(data)
@@ -156,11 +180,13 @@ tree.grow.help <- function(data, nmin, minleaf, nfeat) {
   return(tree)
 }
 
-#in tree grow entry of x,y,nmin,minleaf,nfeat + combine the vector y with our matrix of numbers
+#tree.grow accepts as inputs x,y,nmin,minleaf,nfeat + combine the vector y with our matrix of numbers
+#returns the tree.grow.help(data, nmin, minleaf, nfeat)
 tree.grow <- function(x, y, nmin, minleaf, nfeat) {
   data <- cbind(x, "y" = y)
   return(tree.grow.help(data, nmin, minleaf, nfeat))
 }
+
 
 tree.classify.help <- function(sample, tr) {
   c <- tr[[1]]
@@ -181,6 +207,10 @@ tree.classify.help <- function(sample, tr) {
   return(tree.classify.help(sample, tree))
 }
 
+
+#tree.classify(x,tr) accepts as input the data matrix containing the attribute values of the cases require prediction
+#and tr= the tree object cteated by the tree.grow
+#calls tree.classify.help and returns predictions
 tree.classify <- function(x, tr) {
   predictions <- c()
   if ( class(tr) != "list" ) {
