@@ -1,5 +1,6 @@
 
 source("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/Assignment1.r")
+library("mlbench")
 
 precision <- function(y_p, y_r) { # TP/(TP + FP)
   TP <- 0
@@ -48,6 +49,11 @@ accurancy <- function(y_p, y_r) { # (TP + TN)/(TP + TP + FP + FN)
       FP <- FP + 1
     }
   }
+  
+  print(paste("TP: ", TP))
+  print(paste("TN: ", TN))
+  print(paste("FP: ", FP))
+  print(paste("FN: ", FN))
   return((TP + TN)/(TP + TP + FP + FN))
 }
 
@@ -65,7 +71,22 @@ toZeroOne <- function(vec) { # rewrite with apply
   return(v)
 }
 
-credit.dat <- read.csv("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/credit.txt")
+credit.dat <- read.csv("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/Data/credit.txt")
+credit.dat.x <- credit.dat[, 1:5]
+credit.dat.y <- credit.dat[, 6]
+
+credit.dat.single.tree <- tree.grow(credit.dat.x, credit.dat.y, 20, 1, 41)
+credit.dat.single.prediciton.train <- tree.classify(credit.dat.x, credit.dat.single.tree)
+credit.dat.single.accurancy.train <- accurancy(credit.dat.single.prediciton.train, credit.dat.y)
+
+data(PimaIndiansDiabetes)
+pima.x <- PimaIndiansDiabetes[, 1:8]
+pima.y <- as.numeric(PimaIndiansDiabetes[, 9])
+pima.y <- pima.y - rep(1, times = length(pima.y))
+
+pima.single.tree <- tree.grow(pima.x, pima.y, 20, 5, 41)
+pima.single.prediciton.train <- tree.classify(pima.x, pima.single.tree)
+pima.single.accurancy.train <- accurancy(pima.single.prediciton.train, pima.y)
 
 eclipse.2 <- read.csv(file=file.path("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/Data", "eclipse-metrics-packages-2.0.csv"), sep = ";")
 eclipse.2.x <- eclipse.2[, c(3, 5:44)]
@@ -93,17 +114,17 @@ eclipse.single.accurancy.test <- accurancy(eclipse.single.prediciton.test, eclip
 
 ### BAGGING ###
 print("bagging")
-eclipse.bagging.tree <- tree.grow.bag(eclipse.2.x, eclipse.2.y, 15, 5, 41, 100)
-
-eclipse.bagging.prediciton.train <- tree.classify.bag(eclipse.bagging.tree, eclipse.2.x)
-eclipse.bagging.precision.train <- precision(eclipse.bagging.prediciton.train, eclipse.2.y)
-eclipse.bagging.recall.train <- recall(eclipse.bagging.prediciton.train, eclipse.2.y)
-eclipse.bagging.accurancy.train <- accurancy(eclipse.bagging.prediciton.train, eclipse.2.y)
-
-eclipse.bagging.prediciton.test <- tree.classify.bag(eclipse.bagging.tree, eclipse.3.x)
-eclipse.bagging.precision.test <- precision(eclipse.bagging.prediciton.test, eclipse.3.y)
-eclipse.bagging.recall.test <- recall(eclipse.bagging.prediciton.test, eclipse.3.y)
-eclipse.bagging.accurancy.test <- accurancy(eclipse.bagging.prediciton.test, eclipse.3.y)
+# eclipse.bagging.tree <- tree.grow.bag(eclipse.2.x, eclipse.2.y, 15, 5, 41, 100)
+# 
+# eclipse.bagging.prediciton.train <- tree.classify.bag(eclipse.bagging.tree, eclipse.2.x)
+# eclipse.bagging.precision.train <- precision(eclipse.bagging.prediciton.train, eclipse.2.y)
+# eclipse.bagging.recall.train <- recall(eclipse.bagging.prediciton.train, eclipse.2.y)
+# eclipse.bagging.accurancy.train <- accurancy(eclipse.bagging.prediciton.train, eclipse.2.y)
+# 
+# eclipse.bagging.prediciton.test <- tree.classify.bag(eclipse.bagging.tree, eclipse.3.x)
+# eclipse.bagging.precision.test <- precision(eclipse.bagging.prediciton.test, eclipse.3.y)
+# eclipse.bagging.recall.test <- recall(eclipse.bagging.prediciton.test, eclipse.3.y)
+# eclipse.bagging.accurancy.test <- accurancy(eclipse.bagging.prediciton.test, eclipse.3.y)
 
 
 ### RANDOM FOREST ###
