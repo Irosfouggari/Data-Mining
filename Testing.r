@@ -1,5 +1,7 @@
 
 source("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/Assignment1.r")
+# source("C:/Users/Iro Sfoungari/Documents/Data-Mining/Assignment1.r")
+
 library("mlbench")
 
 precision <- function(y_p, y_r) { # TP/(TP + FP)
@@ -72,6 +74,8 @@ toZeroOne <- function(vec) { # rewrite with apply
 }
 
 credit.dat <- read.csv("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/Data/credit.txt")
+# credit.dat <- read.csv("C:/Users/Iro Sfoungari/credit.txt")
+
 credit.dat.x <- credit.dat[, 1:5]
 credit.dat.y <- credit.dat[, 6]
 
@@ -89,10 +93,14 @@ pima.single.prediciton.train <- tree.classify(pima.x, pima.single.tree)
 pima.single.accurancy.train <- accurancy(pima.single.prediciton.train, pima.y)
 
 eclipse.2 <- read.csv(file=file.path("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/Data", "eclipse-metrics-packages-2.0.csv"), sep = ";")
+# eclipse.2 <- read.csv(file=file.path("C:/Users/Iro Sfoungari/DataForTheFirstAs", "eclipse-metrics-packages-2.0.csv"), sep = ";")
+
 eclipse.2.x <- eclipse.2[, c(3, 5:44)]
 eclipse.2.y <- toZeroOne(eclipse.2[, 4])
 
 eclipse.3 <- read.csv(file=file.path("/Users/Ana/Documents/Sola/Faks/2s/2l/DM/Assignment1/Data", "eclipse-metrics-packages-3.0.csv"), sep = ";")
+# eclipse.3 <- read.csv(file=file.path("C:/Users/Iro Sfoungari/DataForTheFirstAs", "eclipse-metrics-packages-3.0.csv"), sep = ";")
+
 eclipse.3.x <- eclipse.3[, c(3, 5:44)]
 eclipse.3.y <- toZeroOne(eclipse.3[, 4])
 

@@ -1,4 +1,5 @@
 
+#impurity(vector) given a vector returns the impurity (return(p*(1-p)))
 impurity <- function(vector) {
   n <- length(vector)
   n_0 <- length(which(vector == 0))
@@ -6,8 +7,16 @@ impurity <- function(vector) {
   return(p*(1-p))
 }
 
+#bestsplit(column, classification_column, minleaf) counts the bestsplit 
+#returns a list where as the first element contains the bestquality and as the second element the best condition
+#bs <- list()
+#bs[[1]] <- bquality
+#bs[[2]] <- bcondition
+#return(bs)
 best.split <- function(data, column_name, labeling_clumn_name, minleaf) {
   
+  #then sort x and remove duplicated elements 
+  #returns removed duplicate elements with ascending or descending order
   sorted_x <- sort(unique(data[, column_name]))
   bquality <- NULL
   bcondition <- NULL
@@ -15,15 +24,21 @@ best.split <- function(data, column_name, labeling_clumn_name, minleaf) {
   
   i <- 1
   for ( i in 1:(length(sorted_x) - 1) ) {
+    #from assignment1: average of two consecutive values of x in the sorted order
     c <- (sorted_x[i] + sorted_x[i+1]) / 2
     
+    #one child x<=c
     subdata_1 <- data[which(data[,column_name] <= c), , drop = FALSE]
+    #other child x>c
     subdata_2 <- data[which(data[,column_name] > c), , drop = FALSE]
     
     n1 <- nrow(subdata_1)
     n2 <- nrow(subdata_2)
     
-    if ( (n1 < minleaf) || (n2 < minleaf) ) { # we do not allow these splits
+    if ( (n1 < minleaf) || (n2 < minleaf) ) { 
+      # we do not allow these splits
+      # if we aloud check the impurity
+      #best split the split that achieve the highest impurity
       next
     }
     
@@ -49,6 +64,11 @@ best.split <- function(data, column_name, labeling_clumn_name, minleaf) {
   return(bs)
 }
 
+#is.leaf(data, nmin) accepts as input the data(x+y) and controls the leaf cases or a pure node.
+#if the number od data columns fewer than 1 cannotsplit anymore
+#if the number of data rows feweer than nmin=> becomes a leaf
+#count the length of those data belong to class=0 or class=0 and check for pure node
+#return(TRUE)/(FALSE)
 is.leaf <- function(data, nmin) {
   if ( (nrow(data) < nmin) || (impurity(data[, "y"]) == 0) ) { # we do not allow split anymore || pure node
     return(TRUE)
@@ -56,6 +76,12 @@ is.leaf <- function(data, nmin) {
   return(FALSE)
 }
 
+#split.node(tmp_data, nmin, minleaf) accepts as input temp.data from tree.grow help 
+#and for those nodes are not leaves calls bestsplit()
+#returns a list where as the first element contains the bestquality and as the second element the best condition
+#col_con[[1]] <- column_label
+#col_con[[2]] <- column_condition
+#return(col_con)
 split.node <- function(data, nmin, minleaf) {
   if ( is.leaf(data, nmin) ) {
     return(NULL)
@@ -120,6 +146,10 @@ split.node <- function(data, nmin, minleaf) {
   return(col_con)
 }
 
+#tree.grow.help(data, nmin, minleaf, nfeat) checks if the number of columns of our data = nfeat
+#then calls split.node that calls best.split
+#accepts the best split label and the best split condition
+#and then creates the tree with recursion
 tree.grow.help <- function(data, labeling_column_name, nmin, minleaf, nfeat) {
   nc <- ncol(data)
   
@@ -159,6 +189,8 @@ tree.grow.help <- function(data, labeling_column_name, nmin, minleaf, nfeat) {
   return(tree)
 }
 
+#tree.grow accepts as inputs x,y,nmin,minleaf,nfeat + combine the vector y with our matrix of numbers
+#returns the tree.grow.help(data, nmin, minleaf, nfeat)
 tree.grow <- function(x, y, nmin, minleaf, nfeat) {
   data <- cbind(x, "y" = y)
   return(tree.grow.help(data, "y", nmin, minleaf, nfeat))
@@ -183,6 +215,9 @@ tree.classify.help <- function(sample, tr) {
   return(tree.classify.help(sample, tree))
 }
 
+#tree.classify(x,tr) accepts as input the data matrix containing the attribute values of the cases require prediction
+#and tr= the tree object cteated by the tree.grow
+#calls tree.classify.help and returns predictions
 tree.classify <- function(x, tr) {
   predictions <- c()
 
@@ -194,6 +229,7 @@ tree.classify <- function(x, tr) {
   return(predictions)
 }
 
+#tree.grow.bag same arguments + m (number of bootstrap samples)
 tree.grow.bag <- function(x, y, nmin, minleaf, nfeat, m) {
   trees <- list()
   for ( i in 1:m ) {
@@ -205,6 +241,7 @@ tree.grow.bag <- function(x, y, nmin, minleaf, nfeat, m) {
   return(trees)
 }
 
+#input a list of trees and a data matrix x
 tree.classify.bag <- function(trees, x) {
   predictions <- c()
   num_trees <- length(trees)
@@ -228,4 +265,3 @@ tree.classify.bag <- function(trees, x) {
   
   return(predictions)
 }
-
