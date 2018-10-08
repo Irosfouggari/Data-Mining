@@ -1,0 +1,6 @@
+\contentsline {section}{\numberline {1}Short Description of the Data}{2}
+\contentsline {section}{\numberline {2}Single Tree}{3}
+\contentsline {section}{\numberline {3}Single Tree, Bagging, Random Forests}{4}
+\contentsline {subsection}{\numberline {3.1}Single Tree}{4}
+\contentsline {subsection}{\numberline {3.2}Bagging}{4}
+\contentsline {subsection}{\numberline {3.3}Random Forests}{4}
