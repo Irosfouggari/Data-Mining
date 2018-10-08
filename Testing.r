@@ -122,17 +122,17 @@ eclipse.single.accurancy.test <- accurancy(eclipse.single.prediciton.test, eclip
 
 ### BAGGING ###
 print("bagging")
-# eclipse.bagging.tree <- tree.grow.bag(eclipse.2.x, eclipse.2.y, 15, 5, 41, 100)
-# 
-# eclipse.bagging.prediciton.train <- tree.classify.bag(eclipse.bagging.tree, eclipse.2.x)
-# eclipse.bagging.precision.train <- precision(eclipse.bagging.prediciton.train, eclipse.2.y)
-# eclipse.bagging.recall.train <- recall(eclipse.bagging.prediciton.train, eclipse.2.y)
-# eclipse.bagging.accurancy.train <- accurancy(eclipse.bagging.prediciton.train, eclipse.2.y)
-# 
-# eclipse.bagging.prediciton.test <- tree.classify.bag(eclipse.bagging.tree, eclipse.3.x)
-# eclipse.bagging.precision.test <- precision(eclipse.bagging.prediciton.test, eclipse.3.y)
-# eclipse.bagging.recall.test <- recall(eclipse.bagging.prediciton.test, eclipse.3.y)
-# eclipse.bagging.accurancy.test <- accurancy(eclipse.bagging.prediciton.test, eclipse.3.y)
+eclipse.bagging.tree <- tree.grow.bag(eclipse.2.x, eclipse.2.y, 15, 5, 41, 100)
+
+eclipse.bagging.prediciton.train <- tree.classify.bag(eclipse.bagging.tree, eclipse.2.x)
+eclipse.bagging.precision.train <- precision(eclipse.bagging.prediciton.train, eclipse.2.y)
+eclipse.bagging.recall.train <- recall(eclipse.bagging.prediciton.train, eclipse.2.y)
+eclipse.bagging.accurancy.train <- accurancy(eclipse.bagging.prediciton.train, eclipse.2.y)
+
+eclipse.bagging.prediciton.test <- tree.classify.bag(eclipse.bagging.tree, eclipse.3.x)
+eclipse.bagging.precision.test <- precision(eclipse.bagging.prediciton.test, eclipse.3.y)
+eclipse.bagging.recall.test <- recall(eclipse.bagging.prediciton.test, eclipse.3.y)
+eclipse.bagging.accurancy.test <- accurancy(eclipse.bagging.prediciton.test, eclipse.3.y)
 
 
 ### RANDOM FOREST ###
