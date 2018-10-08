@@ -66,10 +66,8 @@ best.split <- function(x, y, minleaf) {
 # INPUT: data (matrix), nmin (numeric) 
 # OUTPUT: TRUE or FALSE
 # The function accepts as input the data and checks if it is a leaf (if number of records is lower than nmin or the node is pure).
-is.leaf <- function(x, y, nmin) {
-  # is.leaf <- function(data, labeling_column, nmin) {
-  if ( (nrow(x) < nmin) || (impurity(y) == 0) ) { 
-    # if ( (nrow(data) < nmin) || (impurity(data[, labeling_column]) == 0) ) { 
+is.leaf <- function(data, labeling_column, nmin) {
+  if ( (nrow(data) < nmin) || (impurity(data[, labeling_column]) == 0) ) { 
     return(TRUE)
   }
   return(FALSE)
@@ -80,18 +78,13 @@ is.leaf <- function(x, y, nmin) {
 # OUTPUT: [name of the column after which we split the node, number which separetes child nodes from eachother] / NULL (if we can not split)
 # The function finds the optimal split and returns column name after which the best split is done after and the value which decides in which child node we continue.
 # If there is no split found, the function returns NULL
-#split.node <- function(data, lebeling_column, nmin, minleaf) {
-split.node <- function(x, y, nmin, minleaf) {
-  if ( is.leaf(x, y, nmin) ) {
-  # if ( is.leaf(data, lebeling_column, nmin) ) {
+split.node <- function(data, lebeling_column, nmin, minleaf) {
+  if ( is.leaf(data, lebeling_column, nmin) ) {
     return(NULL)
   }
   
-  # column_names <- names(data)
-  # classification_column <- data[, lebeling_column]
-  
-  column_names <- names(x)
-  classification_column <- y
+  column_names <- names(data)
+  classification_column <- data[, lebeling_column]
   
   bs <- NULL
   
@@ -101,13 +94,10 @@ split.node <- function(x, y, nmin, minleaf) {
   left_data <- NULL
   right_data <- NULL
   
-  for ( c in 1:(length(column_names)) ) {
-    # for ( c in 1:(length(column_names)-1) ) {
+  for ( c in 1:(length(column_names)-1) ) {
     column_name <- column_names[c]
-    # column <- data[, column_name]
-    column <- x[, column_name]
-    # tmp_bs <- best.split(data[, column_name], data[, lebeling_column], minleaf)
-    tmp_bs <- best.split(column, y, minleaf)
+    column <- data[, column_name]
+    tmp_bs <- best.split(data[, column_name], data[, lebeling_column], minleaf)
     
     if ( is.null(tmp_bs) ) { # skip, there does not exist a best split
       next
@@ -156,31 +146,23 @@ split.node <- function(x, y, nmin, minleaf) {
 # INPUT: data (matrix), nmin (numeric), minleaf (numeric), nfeat (numeric)
 # OUTPUT: tree which is defined recursively: [[attribute name, value which separates left and right tree], left tree, right tree], if tree is a leaf it equals to either 0 or 1 
 # The function grows a tree recursively: finds a best split; if it exists it continues the same ways on child nodes, otherwise it returns 0 or 1 (majority rule).
-tree.grow.help <- function(x, y, nmin, minleaf, nfeat) {
-  # tree.grow.help <- function(data, labeling_column, nmin, minleaf, nfeat) {
-  # nc <- ncol(data)
-  nc <- ncol(x)
+tree.grow.help <- function(data, labeling_column, nmin, minleaf, nfeat) {
+  nc <- ncol(data)
   
   if ( nc <= nfeat + 1 ) { # +1 due to y column
-    # tmp_data <- data
-    # tmp_labeling_column <- labeling_column
-    tmp_x <- x
+    tmp_data <- data
+    tmp_labeling_column <- labeling_column
   } else {
-    # rnd_columns <- sample(c(1:nc)[-labeling_column], size = nfeat, replace = FALSE)
-    # tmp_data <- data[, c(rnd_columns, labeling_column), drop = FALSE] # we add lebeling column
-    # tmp_labeling_column <- nfeat + 1
-    rnd_columns <- sample(c(1:nc), size = nfeat, replace = FALSE)
-    tmp_x <- x[, c(rnd_columns), drop = FALSE]
+    rnd_columns <- sample(c(1:nc)[-labeling_column], size = nfeat, replace = FALSE)
+    tmp_data <- data[, c(rnd_columns, labeling_column), drop = FALSE] # we add lebeling column
+    tmp_labeling_column <- nfeat + 1
   }
   
-  # bsplit <- split.node(tmp_data, tmp_labeling_column, nmin, minleaf) 
-  bsplit <- split.node(tmp_x, y, nmin, minleaf) 
+  bsplit <- split.node(tmp_data, tmp_labeling_column, nmin, minleaf) 
   
   if ( is.null(bsplit) ) { # split does not exist -> node becomes a leaf
-    # n_0 <- length(which(data[, labeling_column] == 0))
-    # n_1 <- length(which(data[, labeling_column] == 1))
-    n_0 <- length(which(y == 0))
-    n_1 <- length(which(y == 1))
+    n_0 <- length(which(data[, labeling_column] == 0))
+    n_1 <- length(which(data[, labeling_column] == 1))
     if ( n_0 >= n_1 ) {
       return(0)
     }
@@ -190,21 +172,12 @@ tree.grow.help <- function(x, y, nmin, minleaf, nfeat) {
   bsplit_label <- bsplit[["column_label"]]
   bsplit_condition <- bsplit[["column_condition"]]
   
-  # left_data <- data[which(data[, bsplit_label] <= bsplit_condition), , drop = FALSE]
-  # left_tree <- tree.grow.help(left_data, labeling_column, nmin, minleaf, nfeat)
-  # 
-  # right_data <- data[which(data[, bsplit_label] > bsplit_condition), , drop = FALSE]
-  # right_tree <- tree.grow.help(right_data, labeling_column, nmin, minleaf, nfeat)
-  
-  left_data <- which(x[, bsplit_label] <= bsplit_condition)
-  left_x <- x[left_data, , drop = FALSE]
-  left_y <- y[left_data]
-  left_tree <- tree.grow.help(left_x, left_y, nmin, minleaf, nfeat)
-  
-  right_data <- which(x[, bsplit_label] > bsplit_condition)
-  right_x <- x[right_data, , drop = FALSE]
-  right_y <- y[right_data]
-  right_tree <- tree.grow.help(right_x, right_y, nmin, minleaf, nfeat)
+  left_rows <- which(data[, bsplit_label] <= bsplit_condition)
+  left_data <- data[left_rows, , drop = FALSE]
+  left_tree <- tree.grow.help(left_data, labeling_column, nmin, minleaf, nfeat)
+
+  right_data <- data[-left_rows, , drop = FALSE]
+  right_tree <- tree.grow.help(right_data, labeling_column, nmin, minleaf, nfeat)
   
   tree <- list()
   tree[["label_condition"]] <- bsplit 
@@ -220,7 +193,7 @@ tree.grow.help <- function(x, y, nmin, minleaf, nfeat) {
 # Function binds “x” matrix with labeling vector “y” and gives the new matrig to the function tree.grow.help (with other parameters).
 tree.grow <- function(x, y, nmin, minleaf, nfeat) {
   data <- cbind(x, y)
-  return(tree.grow.help(x, y, nmin, minleaf, nfeat))
+  return(tree.grow.help(data, ncol(data), nmin, minleaf, nfeat))
 }
 
 # tree.classify.help
