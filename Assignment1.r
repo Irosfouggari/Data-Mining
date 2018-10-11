@@ -1,5 +1,3 @@
-
-
 # impurity
 # INPUT: vector (vector)
 # OUTPUT: Gini index (numeric)
