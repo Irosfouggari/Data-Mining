@@ -39,7 +39,9 @@ October, 2018
 \tableofcontents
 
 \begin{abstract}
-    In the first Data Mining assignment, we were asked to write two main functions tree.grow and tree.classify with specific input arguments each. Initially, we had to create a single tree, but then we had to expand it to Bagging and Random Forests by adding two auxiliary functions, tree.grow.bag and tree.classify.bag. The above code was created in order to analyse the Eclipse Bug Dataset. More specifically we had to do some tests in order to predict if any post release bugs have been reported. In other words, we created a single tree for both the training and the test set, while at the same time we followed the same procedure for Bagging and Random Forests. Finally, we examined accuracy, precision and recall for each dataset and case and we ended up to the following conclusion. With $Z$-test we proved that the difference in the classification accuracy between Single Tree and Random Forests is not statistically significant, in other cases it is.
+    In the first Data Mining assignment, we were asked to write two main functions tree.grow and tree.classify with specific input arguments each. Initially, we had to create a single tree, but then we had to expand it to Bagging and Random Forests by adding two auxiliary functions, tree.grow.bag and tree.classify.bag. The above code was created in order to analyse the Eclipse Bug Dataset. More specifically we had to do some tests in order to predict if any post release bugs have been reported. In other words, we created a single tree for both the training and the test set, while at the same time we followed the same procedure for Bagging and Random Forests. Finally, we examined accuracy, precision and recall for each dataset and case and we ended up to the following conclusion. With $Z$-test we proved that the difference in the classification accuracy between Single Tree and Random Forests is not statistically significant, otherwise it is. 
+    
+We ran the code several times to check our results and although there were some small differences, we chose to present the most representative.
 \end{abstract}
 
 \section{Short Description of the Data}
@@ -87,7 +89,7 @@ Below (figure \ref{fig: tree1}) we have reproduced the first few splits of the s
 
 \begin{figure}[h!]
 \includegraphics[width=\textwidth]{Tree2.pdf}
-\caption{Splits} % TODO
+\caption{Continuation of the tree from figure \ref{fig: tree1}.} 
 \label{fig: tree2}
 \end{figure}
 
@@ -115,8 +117,8 @@ We used bagging with \verb|nmin = 15|, \verb|minleaf = 5| and \verb|nfeat = 41| 
 \centering
 	\begin{tabular}{c||c|c}
 	True class \textbackslash\ Predicted class & 0 & 1 \\ \hline \hline
-	0 & 305 & 43 \\ \hline
-	1 & 98 & 215
+	0 & 306 & 42 \\ \hline
+	1 & 104 & 209
 	\end{tabular}
 	\caption{Confusion matrix for a bagging run on the test set.}
 	\label{tab: bagging}
@@ -131,8 +133,8 @@ We used random forests with \verb|nmin = 15|, \verb|minleaf = 5| and  \verb|nfea
 \centering
 	\begin{tabular}{c||c|c}
 	True class \textbackslash\ Predicted class & 0 & 1 \\ \hline \hline
-	0 & 268 & 80 \\ \hline
-	1 & 120 & 193
+	0 & 258 & 90 \\ \hline
+	1 & 111 & 202
 	\end{tabular}
 	\caption{Confusion matrix for a random forests run on the test set.}
 	\label{tab: randomforest}
@@ -147,9 +149,9 @@ First, let's have a look at table the \ref{tab: apr}. We can see that accuracy o
 \centering
 	\begin{tabular}{l||c|c|c}
 	& Accuracy & Precision & Recall \\ \hline \hline
-	Single Tree & 0{,}78 & 0{,}69 & 0{,}59 \\ \hline
-	Bagging & 0{,}91 & 0{,}83 & 0{,}69 \\ \hline
-	Random Forests & 0{,}79 & 0{,}71 & 0{,}62  
+	Single Tree & 0{,}68 & 0{,}69 & 0{,}59 \\ \hline
+	Bagging & 0{,}78 & 0{,}83 & 0{,}67 \\ \hline
+	Random Forests & 0{,}70 & 0{,}69 & 0{,}65 
 	\end{tabular}
 	\caption{Accuracies, precisions and recalls of models: Single Tree, Bagging and Random Forests.}
 	\label{tab: apr}
@@ -166,9 +168,9 @@ In the table \ref{tab: z} there are $Z$-values for all the possible comparisons.
 \centering
 	\begin{tabular}{l||c}
 	Compared algorithms & $Z$-value   \\ \hline \hline
-	Single Tree, Random Forests & 0{,}81 \\ \hline
-	Single Tree, Bagging &  6{,}33 \\ \hline
-	Bagging, Random Forests & 5{,}45
+	Single Tree, Random Forests & 0{,}68 \\ \hline
+	Single Tree, Bagging &  5{,}75 \\ \hline
+	Bagging, Random Forests & 4{,}57
 	\end{tabular}
 	\caption{Calculated $Z$-values.}
 	\label{tab: z}

@@ -56,12 +56,12 @@ recall <- function(y_p, y_r) { # TP/(TP + FN)
   return(TP/(TP + FN))
 }
 
-accurancy <- function(y_p, y_r) { # (TP + TN)/(TP + TP + FP + FN)
+accurancy <- function(y_p, y_r) { # (TP + TN)/(TP + TN + FP + FN)
   TP <- tp(y_p, y_r)
   FN <- fn(y_p, y_r)
   TN <- tn(y_p, y_r)
   FP <- fp(y_p, y_r)
-  return((TP + TN)/(TP + TP + FP + FN))
+  return((TP + TN)/(TP + TN + FP + FN))
 }
 
 toZeroOne <- function(vec) { # rewrite with apply
