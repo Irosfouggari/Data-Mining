@@ -15,13 +15,13 @@
 
 \includegraphics[scale=0.35]{UUlogo.png}
 
-\vspace{40mm}
+\vspace{50mm}
 
 \begin{center}
 \begin{large}
 Data Mining: Assignment 1 \\[3mm]
 \textbf{
-\uppercase{Classification Trees, Bagging and Random Forests}} \\[20mm]
+\uppercase{Classification Trees, Bagging and Random Forests}} \\[25mm]
 \end{large}
 
 \begin{tabularx}{\textwidth}{YY}
@@ -39,11 +39,11 @@ October, 2018
 \tableofcontents
 
 \begin{abstract}
-f
+    In the first Data Mining assignment, we were asked to write two main functions tree.grow and tree.classify with specific input arguments each. Initially, we had to create a single tree, but then we had to expand it to Bagging and Random Forests by adding two auxiliary functions, tree.grow.bag and tree.classify.bag. The above code was created in order to analyse the Eclipse Bug Dataset. More specifically we had to do some tests in order to predict if any post release bugs have been reported. In other words, we created a single tree for both the training and the test set, while at the same time we followed the same procedure for Bagging and Random Forests. Finally, we examined accuracy, precision and recall for each dataset and case and we ended up to the following conclusion. With $Z$-test we proved that the difference in the classification accuracy between Single Tree and Random Forests is not statistically significant, in other cases it is.
 \end{abstract}
 
 \section{Short Description of the Data}
- In the assignment we are asked to use the algorithms we have implemented to analyse the bug dataset of the Eclipse programming environment, before and after the release of each packet. According to the accompanying article \cite{article}, in order to explain the reason why some programs are more vulnerable to failure than others, we need to take a look at a bug database. Bug databases, list all the errors that occurred during the lifetime of a software. More specifically, the dataset contains information about the number of faults that have been reported in the first six months before and after release. As reported by the authors, metrics are useful for predicting the thickness of the defects. For the assignment we are going to use the 2.0 release as the training set and the 3.0 release as the test set and we are going to monitor if errors have been reported to later versions. We are asked to use the same metrics as the authors and the number of pre-release bugs. 
+  In the assignment we are asked to use the algorithms we have implemented to analyse the bug dataset of the Eclipse programming environment, before and after the release of each packet. According to the accompanying article \cite{article}, in order to explain the reason why some programs are more vulnerable to failure than others, we need to take a look at a bug database. Bug databases, list all the errors that occurred during the lifetime of a software. More specifically, the dataset contains information about the number of faults that have been reported in the first six months before and after release. As reported by the authors, metrics are useful for predicting the thickness of the defects. For the assignment we are going to use the 2.0 release as the training set and the 3.0 release as the test set and we are going to monitor if errors have been reported to later versions. We are asked to use the same metrics as the authors and the number of pre-release bugs. 
  
  These metrics are: 
  \begin{itemize}
@@ -77,9 +77,19 @@ The test set consists of 661 samples:
 \end{itemize}
 
 \section{Single Tree}
-Give a picture of the first few splits of the single tree. Assign to the majority class in the leaf nodes of this tree. Discuss whether the classification rule you get makes sense, given the meaning of the attributes. 
+Below (figure \ref{fig: tree1}) we have reproduced the first few splits of the single tree. We continue splitting until we get the representation of the left sub-tree. We have to process the given data, and draw to some conclusions in order to decide whether our classification rule makes sense. In our tree, the initial split is based on the number of pre-released defects that are detected during the development and testing of the program. As the split begins, we see that for the better case which is the one with the fewest pre-released defects ($\leq 4.5$), we have a shorter cyclomatic complexity (a software metric, used to indicate the complexity of a program) \verb|VG_max|. This split seems quite reasonable if we think that with a more complex code we predict more bugs and vice versa, with fewer pre-released defects the complexity is reduced accordingly. Then, we split into the smaller total number of static methods \verb|NSM_sum|, fewer total number of method calls \verb|FOUT_sum|, smaller average of nested block depth \verb|MBD_avg|, fewer maximum number of fields \verb|NOF_max|, smaller average number of methods \verb|NOM_avg| and static methods \verb|NSM_avg| respectively and finally fewer lines of code. Consequently, we could support that the classification rule we created leads to reasonable results, as less complex code, gives less methods, method calls and other programming structures and finally fewer total lines of code. 
 
- Below we have reproduced the first few splits of the single tree. We continue splitting until we get the representation of the left sub-tree. We have to process the given data, and draw to some conclusions in order to decide whether our classification rule makes sense. In our tree, the initial split is based on the number of pre-released defects that are detected during the development and testing of the program. As the split begins, we see that for the better case which is the one with the fewest pre-released defects ($\leq 4.5$), we have a shorter cyclomatic complexity (a software metric, used to indicate the complexity of a program) \verb|VG_max|. This split seems quite reasonable if we think that with a more complex code we predict more bugs and vice versa, with fewer pre-released defects the complexity is reduced accordingly. Then, we split into the smaller total number of static methods \verb|NSM_sum|, fewer total number of method calls \verb|FOUT_sum|, smaller average of nested block depth \verb|MBD_avg|, fewer maximum number of fields \verb|NOF_max|, smaller average number of methods \verb|NOM_avg| and static methods \verb|NSM_avg| respectively and finally fewer lines of code. Consequently, we could support that the classification rule we created leads to reasonable results, as less complex code, gives less methods, method calls and other programming structures and finally fewer total lines of code. 
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{Tree1.pdf}
+\caption{First splits of the trained single tree.}
+\label{fig: tree1}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[width=\textwidth]{Tree2.pdf}
+\caption{Splits} % TODO
+\label{fig: tree2}
+\end{figure}
 
 \section{Single Tree, Bagging and Random Forests}
 
@@ -105,8 +115,8 @@ We used bagging with \verb|nmin = 15|, \verb|minleaf = 5| and \verb|nfeat = 41| 
 \centering
 	\begin{tabular}{c||c|c}
 	True class \textbackslash\ Predicted class & 0 & 1 \\ \hline \hline
-	0 & 308 & 40 \\ \hline
-	1 & 101 & 212
+	0 & 305 & 43 \\ \hline
+	1 & 98 & 215
 	\end{tabular}
 	\caption{Confusion matrix for a bagging run on the test set.}
 	\label{tab: bagging}
@@ -121,8 +131,8 @@ We used random forests with \verb|nmin = 15|, \verb|minleaf = 5| and  \verb|nfea
 \centering
 	\begin{tabular}{c||c|c}
 	True class \textbackslash\ Predicted class & 0 & 1 \\ \hline \hline
-	0 & 269 & 79 \\ \hline
-	1 & 117 & 196
+	0 & 268 & 80 \\ \hline
+	1 & 120 & 193
 	\end{tabular}
 	\caption{Confusion matrix for a random forests run on the test set.}
 	\label{tab: randomforest}
@@ -131,16 +141,40 @@ We used random forests with \verb|nmin = 15|, \verb|minleaf = 5| and  \verb|nfea
 
 
 \section{Differences in Accuracy}
+First, let's have a look at table the \ref{tab: apr}. We can see that accuracy of Bagging is higher that accuracies of Single Tree and Random Forests. So, in the next step we would like to see if the difference is statistically significant.
 
 \begin{table}[h!]
 \centering
 	\begin{tabular}{l||c|c|c}
 	& Accuracy & Precision & Recall \\ \hline \hline
 	Single Tree & 0{,}78 & 0{,}69 & 0{,}59 \\ \hline
-	Bagging & 0{,}92 & 0{,}84 & 0{,}68 \\ \hline
-	Random Forests & 0{,}79 & 0{,}71 & 0{,}63  
+	Bagging & 0{,}91 & 0{,}83 & 0{,}69 \\ \hline
+	Random Forests & 0{,}79 & 0{,}71 & 0{,}62  
 	\end{tabular}
+	\caption{Accuracies, precisions and recalls of models: Single Tree, Bagging and Random Forests.}
+	\label{tab: apr}
 \end{table}
+
+To test if the differences in accuracy found on the test set are statistically significant we used $Z$-test \cite{accuracy}:
+\[
+Z = \frac{|f_{12} - f_{21}|}{\sqrt{f_{12} + f_{21}}}
+\]
+where $f_{12}$ denotes the number of samples that were classified correctly by the first algorithm and misclassified by the second algorithm (similar for $f_{21}$). If $Z \geq 1{,}96$ that means that a difference in the classification accuracy between the confusion matrices is statistically significant ($p \leq 0{,}05$).
+
+In the table \ref{tab: z} there are $Z$-values for all the possible comparisons.
+\begin{table}[h!]
+\centering
+	\begin{tabular}{l||c}
+	Compared algorithms & $Z$-value   \\ \hline \hline
+	Single Tree, Random Forests & 0{,}81 \\ \hline
+	Single Tree, Bagging &  6{,}33 \\ \hline
+	Bagging, Random Forests & 5{,}45
+	\end{tabular}
+	\caption{Calculated $Z$-values.}
+	\label{tab: z}
+\end{table}
+
+We can conclude that the difference in the classification accuracy between the confusion matrices of Single Tree and Random Forests is not statistically significant. In the other two cases, the difference is statistically significant.
 
 \bibliographystyle{plain}
 \bibliography{references}

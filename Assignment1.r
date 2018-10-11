@@ -242,7 +242,7 @@ tree.grow.bag <- function(x, y, nmin, minleaf, nfeat, m) {
   trees <- list()
   for ( i in 1:m ) {
     random_rows <- sample(nrow(x), nrow(x), replace = TRUE)
-    tmp_x <- x[random_rows,]
+    tmp_x <- x[random_rows, , drop = FALSE]
     tmp_y <- y[random_rows]
     trees[[i]] <- tree.grow(tmp_x, tmp_y, nmin, minleaf, nfeat)
   }
@@ -260,7 +260,7 @@ tree.classify.bag <- function(trees, x) {
   for (r in 1:nrow(x)) {
     row <- x[r, , drop = FALSE]
     tmp_predictions <- c()
-    for (t in 1:length(trees)) {
+    for (t in 1:num_trees) {
       current_tree <- trees[[t]]
       p <- tree.classify(row, current_tree)
       tmp_predictions <- c(tmp_predictions, p)
