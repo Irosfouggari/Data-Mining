@@ -96,7 +96,7 @@ Below (figure \ref{fig: tree1}) we have reproduced the first few splits of the s
 \section{Single Tree, Bagging and Random Forests}
 
 \subsection{Single Tree}
-We trained a single classification tree on the training set with \verb|nmin = 15|, \verb|minleaf = 5| and \verb|nfeat = 41|. On the test set we got the following confusion matrix \ref{tab: singletree}.
+We trained a single classification tree on the training set with \verb|nmin = 15|, \verb|minleaf = 5| and \verb|nfeat = 41|. On the test set we got the following confusion matrix (table \ref{tab: singletree}).
  
 \begin{table}[h!]
 \centering
@@ -111,7 +111,7 @@ We trained a single classification tree on the training set with \verb|nmin = 15
 
 
 \subsection{Bagging}
-We used bagging with \verb|nmin = 15|, \verb|minleaf = 5| and \verb|nfeat = 41| and \verb|m = 100|. On the test set we got the following confusion matrix \ref{tab: bagging}.
+We used Bagging with \verb|nmin = 15|, \verb|minleaf = 5| and \verb|nfeat = 41| and \verb|m = 100|. On the test set we got the confusion matrix presented in the table \ref{tab: bagging}.
 
 \begin{table}[h!]
 \centering
@@ -127,7 +127,7 @@ We used bagging with \verb|nmin = 15|, \verb|minleaf = 5| and \verb|nfeat = 41| 
 
 
 \subsection{Random Forests}
-We used random forests with \verb|nmin = 15|, \verb|minleaf = 5| and  \verb|nfeat = 6|. On the test set we got the following confusion matrix \ref{tab: randomforest}.
+We used Random Forests with \verb|nmin = 15|, \verb|minleaf = 5| and  \verb|nfeat = 6|. On the test set we got the following confusion (table \ref{tab: randomforest}).
 
 \begin{table}[h!]
 \centering
@@ -157,11 +157,13 @@ First, let's have a look at table the \ref{tab: apr}. We can see that accuracy o
 	\label{tab: apr}
 \end{table}
 
-To test if the differences in accuracy found on the test set are statistically significant we used $Z$-test \cite{accuracy}:
+To test if the differences in accuracy found on the test set are statistically significant, we used $Z$-test \cite{accuracy}:
 \[
 Z = \frac{|f_{12} - f_{21}|}{\sqrt{f_{12} + f_{21}}}
 \]
 where $f_{12}$ denotes the number of samples that were classified correctly by the first algorithm and misclassified by the second algorithm (similar for $f_{21}$). If $Z \geq 1{,}96$ that means that a difference in the classification accuracy between the confusion matrices is statistically significant ($p \leq 0{,}05$).
+
+\newpage
 
 In the table \ref{tab: z} there are $Z$-values for all the possible comparisons.
 \begin{table}[h!]
