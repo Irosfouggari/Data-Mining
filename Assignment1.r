@@ -14,8 +14,6 @@ impurity <- function(vector) {
 # OUTPUT: [quality of the split, condition, minimum of impurities of child nodes]
 # The function finds the best split in a given column, it skips the splits which are not allowed according to the minleaf value.
 best.split <- function(x, y, minleaf) {
-  # then sort x and remove duplicated elements
-  # returns removed duplicate elements with ascending or descending order
   sorted_x <- sort(unique(x))
   bquality <- NULL
   bcondition <- NULL
@@ -84,16 +82,16 @@ split.node <- function(data, lebeling_column, nmin, minleaf) {
     return(NULL)
   }
   
-  column_names <- names(data)
+  column_names <- names(data[,-lebeling_column])
   classification_column <- data[, lebeling_column]
   
   bs <- NULL
   
   column_label <- NULL
   column_condition <- NULL
-  bipurity <- NULL
+  bimpurity <- NULL
   
-  for (c in 1:(length(column_names) - 1)) {
+  for (c in 1:length(column_names)) {
     column_name <- column_names[c]
     column <- data[, column_name]
     tmp_bs <- best.split(column, classification_column, minleaf)
@@ -110,21 +108,18 @@ split.node <- function(data, lebeling_column, nmin, minleaf) {
       column_label <- column_name
       column_condition <- tmp_bs[["condition"]]
       
-      bipurity <- tmp_bs[["impurity"]]
+      bimpurity <- tmp_bs[["impurity"]]
       
-    } else {
-      if (quality == bs) {
-        bipurity_tmp <- tmp_bs[["impurity"]]
+    } else if (quality == bs) {
+      bimpurity_tmp <- tmp_bs[["impurity"]]
+      
+      if (bimpurity_tmp < bimpurity) {
+        bs <- quality
         
-        if (bipurity_tmp < bipurity) {
-          bs <- quality
-          
-          column_label <- column_name
-          column_condition <- tmp_bs[["condition"]]
-          
-          bipurity <- bipurity_tmp
-        }
+        column_label <- column_name
+        column_condition <- tmp_bs[["condition"]]
         
+        bimpurity <- bimpurity_tmp
       }
     }
   }
@@ -143,11 +138,16 @@ split.node <- function(data, lebeling_column, nmin, minleaf) {
 # INPUT: data (matrix), labeling_column (numeric), nmin (numeric), minleaf (numeric), nfeat (numeric)
 # OUTPUT: tree which is defined recursively: [[attribute name, value which separates left and right tree], left tree, right tree], if tree is a leaf it equals to either 0 or 1
 # The function grows a tree recursively: finds a best split; if it exists it continues the same way on child nodes, otherwise it returns 0 or 1 (majority rule).
-tree.grow.help <- function(data, labeling_column, nmin, minleaf, nfeat) {
+tree.grow.help <-
+  function(data,
+           labeling_column,
+           nmin,
+           minleaf,
+           nfeat) {
     nc <- ncol(data)
     
     if (nc <= nfeat + 1) {
-      # +1 due to labeling column
+      # +1 due to a labeling column
       tmp_data <- data
       tmp_labeling_column <- labeling_column
     } else {
@@ -158,8 +158,7 @@ tree.grow.help <- function(data, labeling_column, nmin, minleaf, nfeat) {
       tmp_labeling_column <- nfeat + 1
     }
     
-    bsplit <-
-      split.node(tmp_data, tmp_labeling_column, nmin, minleaf)
+    bsplit <- split.node(tmp_data, tmp_labeling_column, nmin, minleaf)
     
     if (is.null(bsplit)) {
       # split does not exist -> node becomes a leaf
@@ -245,12 +244,14 @@ tree.classify <- function(x, tr) {
 # The function grows m trees and store them in a list.
 tree.grow.bag <- function(x, y, nmin, minleaf, nfeat, m) {
   trees <- list()
+  
   for (i in 1:m) {
     random_rows <- sample(nrow(x), nrow(x), replace = TRUE)
     tmp_x <- x[random_rows, , drop = FALSE]
     tmp_y <- y[random_rows]
     trees[[i]] <- tree.grow(tmp_x, tmp_y, nmin, minleaf, nfeat)
   }
+  
   return(trees)
 }
 
