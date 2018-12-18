@@ -1,2 +1,4 @@
 # Data-Mining
-Academic Assignment Utrecht University MSc
+Academic Assignment
+MSc Algorithmic Data Analysis
+Utrecht University 
